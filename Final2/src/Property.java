@@ -84,47 +84,61 @@ public class Property {
 
     public boolean buildHouse() {
         if (!type.equals("property")) {
-            return false;
+            return false; // Can't build on railroad or utility
         }
 
         if (hasHotel) {
-            return false;
+            return false; // Can't build a house if there's already a hotel
         }
 
         if (houseCount < 4) {
-            houseCount = houseCount + 1;
+            houseCount++;
             return true;
         }
 
-        houseCount = 4;
+        houseCount = 4; // Convert 4 houses to a hotel
         hasHotel = true;
         return true;
     }
 
+    public int getHouseCount() {
+        return houseCount;
+    }
+
+    public boolean hasHotel() {
+        return hasHotel;
+    }
+
     public int getRent() {
+        int index = getRentLevelsIndex(); // Use the method to get the appropriate rent index
+        return rentLevels[index];
+    }
+
+    // New method to get the rent level index based on house count or hotel status
+    public int getRentLevelsIndex() {
         int index = 0;
 
         if (hasHotel) {
-            index = rentLevels.length - 1;
+            index = rentLevels.length - 1; // Hotel rent is the last index in rentLevels
         } else {
             if (houseCount < rentLevels.length) {
                 index = houseCount;
             } else {
-                index = rentLevels.length - 1;
+                index = rentLevels.length - 1; // If there are more houses than rent levels, use the last rent level
             }
         }
-        return rentLevels[index];
+        return index;
     }
 
     public void print() {
         System.out.print("[" + name + "]  $" + price);
 
-        System.out.print("  rent $" + getRent());
+        System.out.print("  Rent: $" + getRent());
 
         System.out.print("  (" + type + ")");
 
         if (houseCount > 0) {
-            System.out.print("  houses=" + houseCount);
+            System.out.print("  Houses: " + houseCount);
         }
 
         if (hasHotel) {

@@ -40,7 +40,7 @@ public class BuyingManager {
 		/* ---------- pay rent if someone else owns ---------- */
 		if (owner != player) {
 			int rent = land.getRent();
-			/* double rent if “nearest Railroad” chance card flagged in owner */
+			/* doubles rent if “nearest Railroad” chance card flagged in owner */
 			if (land.getType().equals("railroad") && owner.doubleRentNextRR) {
 				rent *= 2;
 				owner.doubleRentNextRR = false;  // reset flag

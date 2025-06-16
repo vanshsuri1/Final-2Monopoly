@@ -42,7 +42,7 @@ class CardLinkedList {
         return top.card;
     }
 
-    // Shuffle the deck using Fisher-Yates shuffle
+    // Shuffle 
     public void shuffle() {
         int count = 0;
         CardNode temp = head;

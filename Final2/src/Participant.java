@@ -16,6 +16,8 @@ public class Participant {
     public int jailTurns;       /* 0,1,2 while in Jail   */
     public int doublesStreak;   /* consecutive doubles   */
 
+	public boolean doubleRentNextRR;
+
     /* ------------------------------------------------------------- */
     public Participant(String name) {
 
