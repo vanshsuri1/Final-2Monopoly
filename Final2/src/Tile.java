@@ -6,18 +6,18 @@ public class Tile {
 		this.name = name;
 	}
 
-	/** Called from GameController after the player is moved. */
+
 	void landOn(Participant p, GameController ctrl) {
 
-		/* ---------- Chance ---------- */
+
 		if (name.toLowerCase().contains("chance")) {
 			Card card = Card.drawChance();
 			System.out.println("Chance: " + card.text);
-			card.applyEffect(p, ctrl); // Apply the effect of the drawn Chance card
+			card.applyEffect(p, ctrl); 
 			return;
 		}
 
-		/* ---------- Community Chest ---------- */
+		
 		if (name.toLowerCase().contains("community") && name.toLowerCase().contains("chest")) {
 			Card card = Card.drawChest();
 			System.out.println("Community Chest: " + card.text);
@@ -25,19 +25,19 @@ public class Tile {
 			return;
 		}
 
-		/* ---------- Property / Railroad / Utility ---------- */
+	
 		Property prop = ctrl.getMapManager().getProperty(p.position);
 		if (prop != null) {
 			ctrl.getBuyingManager().handleSpace(p, ctrl.getPlayers(), ctrl.getMapManager());
 			return;
 		}
 
-		/* ---------- Special board squares ---------- */
+
 		if (name.equalsIgnoreCase("Go")) {
 			p.money += 200;
 			System.out.println(p.getName() + " collects $200 for landing on GO.");
 		} else if (name.equalsIgnoreCase("Income Tax")) {
-			// pay tax into Free-Parking pot
+			
 			p.money -= 200;
 			ctrl.addToPot(200);
 			System.out.println(p.getName() + " pays $200 Income Tax.");
@@ -51,14 +51,14 @@ public class Tile {
 			System.out.println(p.getName() + " lands on Free Parking and collects $" + pot + "!");
 		} else if (name.toLowerCase().contains("jail")) {
 			if (name.equalsIgnoreCase("Go To Jail")) {
-				p.position = 10; // square 10 = Jail
+				p.position = 10; 
 				p.inJail = true;
-				p.jailTurns = 0; // reset jail turns on entry
+				p.jailTurns = 0; 
 				System.out.println(p.getName() + " goes directly to Jail!");
-			} else { // “Just Visiting”
+			} else { 
 				System.out.println(p.getName() + " is just visiting Jail.");
 			}
 		}
-		/* Any other label → no action needed */
+		
 	}
 }

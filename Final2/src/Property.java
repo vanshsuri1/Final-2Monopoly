@@ -10,8 +10,8 @@ public class Property {
 	private int mortgageValue;
 	private boolean mortgaged = false;
 
-	private int houseCount = 0; // House count
-	private boolean hasHotel = false; // Hotel flag
+	private int houseCount = 0; 
+	private boolean hasHotel = false; 
 
 	public Property(int location, String name, String type, int price, int rent) {
 		this.location = location;
@@ -102,32 +102,32 @@ public class Property {
 		return true;
 	}
 
-	// Method to get the rent based on houses or hotel
+
 	public int getRent() {
-		int index = getRentLevelsIndex(); // Using the new getRentLevelsIndex method
+		int index = getRentLevelsIndex(); 
 
 		if (index < 0 || index >= rentLevels.length) {
-			return 0; // Return 0 if the index is out of bounds
+			return 0; 
 		}
 		return rentLevels[index];
 	}
 
-	// Method to check if the property has a hotel
+	
 	public boolean hasHotel() {
 		return hasHotel;
 	}
 
-	// Method to get the house count
+	
 	public int getHouseCount() {
 		return houseCount;
 	}
 
-	// Method to get the rent levels index based on house or hotel status
+
 	public int getRentLevelsIndex() {
 		if (hasHotel) {
-			return rentLevels.length - 1; // Hotel is the last index
+			return rentLevels.length - 1; 
 		} else {
-			return houseCount; // The index corresponds to the number of houses
+			return houseCount; 
 		}
 	}
 

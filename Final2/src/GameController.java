@@ -3,34 +3,26 @@ import java.util.Random;
 
 public class GameController {
 
-	/* board reference for SaveLoadManager */
 	private static MapManager boardRef;
 
-	/* managers */
 	private MapManager mapManager;
 	private BuyingManager buyingManager;
 	private AuctionManager auctionManager;
 	private TradeManager tradeManager;
 	private SaveLoadManager saveLoad;
 
-	/* slow printer */
 	private final PrintSlow printer = new PrintSlow();
 
-	/* participants */
 	private Participant[] players;
 
-	/* console input */
 	private final Scanner input = new Scanner(System.in);
 
-	/* ------------ free-parking tax pot ------------ */
-	private int freeParkingPot = 0; // holds Income / Luxury tax until collected
+	private int freeParkingPot = 0;
 
-	/* ------------ main entry ------------ */
 	public static void main(String[] args) {
 		new GameController().start();
 	}
 
-	/* ------------ helpers for other classes ------------ */
 	public static MapManager getBoard() {
 		return boardRef;
 	}
@@ -47,10 +39,6 @@ public class GameController {
 		return players;
 	}
 
-	/*
-	 * =================================================== start()
-	 * ===================================================
-	 */
 	public void start() {
 
 		mapManager = new MapManager();
@@ -62,7 +50,6 @@ public class GameController {
 
 		String filePath = null;
 
-		/* ---------------- optional load ---------------- */
 		System.out.print("Load previous game? (y / n): ");
 		if (input.next().equalsIgnoreCase("y")) {
 			System.out.print("\nEnter save-file path: ");
@@ -74,7 +61,6 @@ public class GameController {
 			}
 		}
 
-		/* ---------------- new game ---------------- */
 		if (players == null) {
 			System.out.print("\nNumber of players (2-4): ");
 			int n = input.nextInt();
@@ -100,10 +86,6 @@ public class GameController {
 		gameLoop();
 	}
 
-	/*
-	 * =================================================== main game loop
-	 * ===================================================
-	 */
 	private void gameLoop() {
 
 		boolean gameOver = false;
@@ -130,10 +112,8 @@ public class GameController {
 						}
 					}
 
-					/* -------- board render -------- */
 					mapManager.render(players);
 
-					/* -------- roll the dice -------- */
 					printer.printSlow(current.getName() + " – Rolling Dice", 75);
 					printer.printSlowln("...", 750);
 
@@ -141,8 +121,7 @@ public class GameController {
 					int d2 = 0;
 					int sum = 0;
 
-					while (d1 == d2) { // loop while doubles
-
+					while (d1 == d2) {
 						d1 = roll();
 						d2 = roll();
 						sum = d1 + d2;
@@ -163,13 +142,12 @@ public class GameController {
 							printer.printSlowln(current.getName() + " is bankrupt!");
 						}
 
-						showStats(); // quick status after each move
+						showStats();
 					}
 				}
 				idxTurn = idxTurn + 1;
 			}
 
-			/* -------- trade phase -------- */
 			tradeManager.trade(players);
 
 			/* -------- auto-save -------- */
@@ -201,10 +179,6 @@ public class GameController {
 		}
 	}
 
-	/*
-	 * =================================================== free-parking helpers
-	 * ===================================================
-	 */
 	public void addToPot(int amount) {
 		if (amount > 0) {
 			freeParkingPot = freeParkingPot + amount;
@@ -217,10 +191,6 @@ public class GameController {
 		return cash;
 	}
 
-	/*
-	 * =================================================== build-related helpers
-	 * ===================================================
-	 */
 	private void listBuildOptions(Participant p) {
 
 		printer.printSlowln("\nBuild-eligible properties:", 25);
@@ -269,10 +239,6 @@ public class GameController {
 		}
 	}
 
-	/*
-	 * =================================================== simple status screen
-	 * ===================================================
-	 */
 	private void showStats() {
 
 		printer.printSlowln("\n-- Status --", 25);
@@ -293,11 +259,7 @@ public class GameController {
 		System.out.println();
 	}
 
-	/*
-	 * =================================================== dice
-	 * ===================================================
-	 */
 	public static int roll() {
-		return (int) (Math.random() * 6) + 1; // return (int)(Math.random() * 6) + 1;
+		return (int) (Math.random() * 6) + 1;
 	}
 }

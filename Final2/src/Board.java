@@ -6,16 +6,15 @@ public class Board {
 			"Illinois", "B. & O. Railroad", "Atlantic", "Ventnor", "Water Works", "MarvinGardens", "Go To Jail",
 			"Pacific", "North Carolina", "Community Chest", "Pennsylvania", "Short Line", "Chance", "Park Place",
 			"Luxury Tax", "Boardwalk" };
-
 	public static final String[] ABBR = { "GO", "ME", "CC1", "BA", "IT", "RR1", "OR", "CH1", "VE", "CO", "JV", "SC",
 			"EC", "SA", "VA", "RR2", "SJ", "CC2", "TE", "NY", "FP", "KY", "CH2", "IN", "IL", "RR3", "AT", "VE2", "WW",
 			"MG", "GJ", "PA", "NC", "CC3", "PE", "SL", "CH3", "PP", "LT", "BW" };
-
 	public static final Property[] properties = new Property[40];
 	static {
+
 		properties[1] = new Property("Mediterranean", 60, 50, new int[] { 2, 10, 30, 90, 160, 250 }, 30, "property");
 		properties[3] = new Property("Baltic", 60, 50, new int[] { 4, 20, 60, 180, 320, 450 }, 30, "property");
-		properties[6] = new Property("Oriental", 100, 50, new int[] { 6, 30, 90, 270, 400, 550 }, 50, "property");
+		properties[6] = new Property(" ", 100, 50, new int[] { 6, 30, 90, 270, 400, 550 }, 50, "property");
 		properties[8] = new Property("Vermont", 100, 50, new int[] { 6, 30, 90, 270, 400, 550 }, 50, "property");
 		properties[9] = new Property("Connecticut", 120, 50, new int[] { 8, 40, 100, 300, 450, 600 }, 60, "property");
 		properties[11] = new Property("St. Charles", 140, 100, new int[] { 10, 50, 150, 450, 625, 750 }, 70,
@@ -51,6 +50,8 @@ public class Board {
 		properties[12] = new Property("ElectricCompany", 150, 0, new int[] { 4, 10 }, 75, "utility");
 		properties[28] = new Property("WaterWorks", 150, 0, new int[] { 4, 10 }, 75, "utility");
 	}
+
+
 
 	private Tile[] tiles;
 

@@ -4,10 +4,7 @@ public class TradeManager {
 
 	private Scanner input = new Scanner(System.in);
 
-	/*
-	 * ========================================================= MAIN ENTRY
-	 * =========================================================
-	 */
+
 	public void trade(Participant[] players) {
 
 		System.out.println("\n--- Trade Phase ---");
@@ -18,7 +15,7 @@ public class TradeManager {
 			return;
 		}
 
-		/* choose participants */
+
 		int idx = 0;
 		while (idx < players.length) {
 			System.out.println((idx + 1) + ": " + players[idx].getName());
@@ -54,25 +51,19 @@ public class TradeManager {
 		}
 	}
 
-	/*
-	 * ========================================================= SUPPORT TYPES
-	 * =========================================================
-	 */
+	
 	private static class TradeOffer {
 		int cash;
-		Property prop; // may be null
+		Property prop; 
 	}
 
-	/*
-	 * ========================================================= BUILD SINGLE OFFER
-	 * =========================================================
-	 */
+
 	private TradeOffer buildOffer(Participant p, String label) {
 
 		TradeOffer offer = new TradeOffer();
 
 		System.out.println("\n" + p.getName() + "'s properties:");
-		printOwnedWithIndex(p); // show index + name
+		printOwnedWithIndex(p); 
 
 		System.out.print("Player " + label + " – choose location (0 = none): ");
 		int loc = Integer.parseInt(input.nextLine());
@@ -91,10 +82,7 @@ public class TradeManager {
 		return offer;
 	}
 
-	/*
-	 * ========================================================= PRINT OFFER SUMMARY
-	 * =========================================================
-	 */
+	
 	private void showOffer(Participant p, TradeOffer offer) {
 
 		System.out.print(p.getName() + " offers ");
@@ -106,33 +94,27 @@ public class TradeManager {
 		System.out.println(" and $" + offer.cash);
 	}
 
-	/*
-	 * ========================================================= EXECUTE SWAP
-	 * =========================================================
-	 */
+	
 	private void executeTrade(Participant a, Participant b, TradeOffer offA, TradeOffer offB) {
 
-		/* property A -> B */
+		
 		if (offA.prop != null) {
 			a.core.sellProperty(offA.prop.getLocation());
 			b.buy(offA.prop);
 		}
 
-		/* property B -> A */
+		
 		if (offB.prop != null) {
 			b.core.sellProperty(offB.prop.getLocation());
 			a.buy(offB.prop);
 		}
 
-		/* cash transfer */
+		
 		a.money = a.money - offA.cash + offB.cash;
 		b.money = b.money - offB.cash + offA.cash;
 	}
 
-	/*
-	 * ========================================================= HELPER – list
-	 * property indexes =========================================================
-	 */
+
 	private void printOwnedWithIndex(Participant p) {
 
 		int pos = 0;

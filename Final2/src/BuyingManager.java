@@ -5,18 +5,14 @@ public class BuyingManager {
 	private final Scanner input = new Scanner(System.in);
 	private final AuctionManager auctionManager = new AuctionManager();
 
-	/*
-	 * ========================================================= Called from
-	 * Tile.landOn → handles buy / rent / build
-	 * =========================================================
-	 */
+
 	public void handleSpace(Participant player, Participant[] players, MapManager map) {
 
 		Property land = map.getProperty(player.position);
 		if (land == null)
-			return; // non-ownable square
+			return; 
 
-		/* ---------- check if someone owns it ---------- */
+
 		Participant owner = null;
 		for (Participant q : players) {
 			if (q.core.getOwnedProperties().searchByLocation(player.position) != null) {
@@ -25,7 +21,7 @@ public class BuyingManager {
 			}
 		}
 
-		/* ---------- unowned: buy or auction ---------- */
+		
 		if (owner == null) {
 			System.out.print("Buy " + land.getName() + " for $" + land.getPrice() + " (y/n): ");
 			if (input.nextLine().equalsIgnoreCase("y") && player.money >= land.getPrice()) {
@@ -39,13 +35,13 @@ public class BuyingManager {
 			return;
 		}
 
-		/* ---------- pay rent if someone else owns ---------- */
+		
 		if (owner != player) {
 			int rent = land.getRent();
-			/* doubles rent if “nearest Railroad” chance card flagged in owner */
+			
 			if (land.getType().equals("railroad") && owner.doubleRentNextRR) {
 				rent *= 2;
-				owner.doubleRentNextRR = false; // reset flag
+				owner.doubleRentNextRR = false; 
 				System.out.println("(Double-rent Railroad)");
 			}
 			System.out.println("Pay rent $" + rent + " to " + owner.getName());
@@ -59,7 +55,7 @@ public class BuyingManager {
 			return;
 		}
 
-		/* ---------- owned by self: build if allowed ---------- */
+	
 		if (land.getType().equals("property") && ownsColourSet(player, land) && !land.isMortgaged()) {
 
 			System.out.print("Build on " + land.getName() + " for $" + land.getHouseCost() + " (y/n): ");
@@ -76,16 +72,12 @@ public class BuyingManager {
 		}
 	}
 
-	/*
-	 * ========================================================= Owns full
-	 * colour-set? (2- or 3-property groups)
-	 * =========================================================
-	 */
+	
 	public boolean ownsColourSet(Participant p, Property sample) {
 
 		int needed = requiredForSet(sample.getLocation());
 		if (needed == 0)
-			return false; // not a colour set
+			return false; 
 
 		/* use first THREE letters of name as group key */
 		String key = sample.getName().substring(0, Math.min(3, sample.getName().length())).toUpperCase();
@@ -102,13 +94,12 @@ public class BuyingManager {
 		return count >= needed;
 	}
 
-	/* small helper: how many properties complete the set? */
+
 	private int requiredForSet(int loc) {
-		/* browns & dark-blues */
+		
 		if (loc == 1 || loc == 3 || loc == 37 || loc == 39)
 			return 2;
-		/* railroads / utilities ignored for building */
-		/* everything else is a 3-property colour */
+
 		return 3;
 	}
 }
