@@ -10,8 +10,8 @@ public class Property {
     private int mortgageValue;
     private boolean mortgaged = false;
 
-    private int houseCount = 0;
-    private boolean hasHotel = false;
+    private int houseCount = 0; // House count
+    private boolean hasHotel = false; // Hotel flag
 
     public Property(int location, String name, String type, int price, int rent) {
         this.location = location;
@@ -19,9 +19,11 @@ public class Property {
         this.type = type;
         this.price = price;
         this.baseRent = rent;
-        this.houseCost = 50; // Default house cost (can change as per game rules)
+        this.houseCost = 0;
+
         this.rentLevels = new int[1];
         this.rentLevels[0] = rent;
+
         this.mortgageValue = price / 2;
     }
 
@@ -33,11 +35,15 @@ public class Property {
         this.mortgageValue = mortgage;
 
         this.rentLevels = new int[rentTable.length];
-        for (int i = 0; i < rentTable.length; i++) {
-            this.rentLevels[i] = rentTable[i];
+        for (int index = 0; index < rentTable.length; index++) {
+            this.rentLevels[index] = rentTable[index];
         }
 
-        this.baseRent = rentTable[0];  // Base rent is the first value in the rent table
+        if (rentTable.length > 0) {
+            this.baseRent = rentTable[0];
+        } else {
+            this.baseRent = 0;
+        }
     }
 
     public int getLocation() {
@@ -76,47 +82,61 @@ public class Property {
         mortgaged = value;
     }
 
+    // Method to build a house (or hotel)
     public boolean buildHouse() {
-        if (!"property".equals(type)) return false;  // Cannot build on railroad or utility
-        if (hasHotel) return false;  // Already has hotel
+        if (!type.equals("property")) {
+            return false;
+        }
+
+        if (hasHotel) {
+            return false;
+        }
+
         if (houseCount < 4) {
-            houseCount++;  // Increment the number of houses
+            houseCount = houseCount + 1;
             return true;
         }
+
         houseCount = 4;
-        hasHotel = true;  // Convert 4 houses to hotel
+        hasHotel = true;
         return true;
     }
 
+    // Method to get the rent based on houses or hotel
     public int getRent() {
-        int index = 0;
+        int index = getRentLevelsIndex();  // Using the new getRentLevelsIndex method
 
-        if (hasHotel) {
-            index = rentLevels.length - 1;  // Last rent is for hotel
-        } else {
-            if (houseCount < rentLevels.length) {
-                index = houseCount;
-            } else {
-                index = rentLevels.length - 1;  // Return the highest rent if more houses are built than allowed
-            }
+        if (index < 0 || index >= rentLevels.length) {
+            return 0; // Return 0 if the index is out of bounds
         }
         return rentLevels[index];
     }
 
-    public int getHouseCount() {
-        return houseCount;
-    }
-
+    // Method to check if the property has a hotel
     public boolean hasHotel() {
         return hasHotel;
     }
 
+    // Method to get the house count
+    public int getHouseCount() {
+        return houseCount;
+    }
+
+    // Method to get the rent levels index based on house or hotel status
+    public int getRentLevelsIndex() {
+        if (hasHotel) {
+            return rentLevels.length - 1;  // Hotel is the last index
+        } else {
+            return houseCount;  // The index corresponds to the number of houses
+        }
+    }
+
     public void print() {
         System.out.print("[" + name + "]  $" + price);
-        System.out.print("  Rent $" + getRent());
+        System.out.print("  rent $" + getRent());
         System.out.print("  (" + type + ")");
         if (houseCount > 0) {
-            System.out.print("  Houses=" + houseCount);
+            System.out.print("  houses=" + houseCount);
         }
         if (hasHotel) {
             System.out.print("  [HOTEL]");

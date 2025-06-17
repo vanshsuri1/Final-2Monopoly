@@ -1,81 +1,71 @@
-import java.util.Random;
+import java.util.*;
+public class CardLinkedList {
 
-class CardLinkedList {
     private static class CardNode {
         Card card;
         CardNode next;
-
-        CardNode(Card c) {
-            card = c;
-            next = null;
-        }
+        CardNode(Card c) { card = c; }
     }
 
     private CardNode head;
 
-    public CardLinkedList() {
+    CardLinkedList() {
         head = null;
     }
 
-    // Insert a card at the end of the list
-    public void insert(Card c) {
-        CardNode newNode = new CardNode(c);
+    void insert(Card c) {
+        CardNode n = new CardNode(c);
         if (head == null) {
-            head = newNode;
+            head = n;
         } else {
-            CardNode current = head;
-            while (current.next != null) {
-                current = current.next;
+            CardNode t = head;
+            while (t.next != null) {
+                t = t.next;
             }
-            current.next = newNode;
+            t.next = n;
         }
     }
 
-    // Draw a card (pop) and rotate it to the bottom of the list
-    public Card draw() {
+    Card draw() {
         if (head == null) {
             return null;
         }
         CardNode top = head;
-        head = head.next; // remove from front
-        insert(top.card); // add it back at the end
+        head = head.next;
+        insert(top.card);
         return top.card;
     }
 
-    // Shuffle 
-    public void shuffle() {
+    void shuffle() {
         int count = 0;
-        CardNode temp = head;
-        while (temp != null) {
+        CardNode t = head;
+        while (t != null) {
             count++;
-            temp = temp.next;
+            t = t.next;
         }
 
         if (count <= 1) return;
 
-        // Copy to an array
-        Card[] cardsArray = new Card[count];
-        temp = head;
+        Card[] arr = new Card[count];
+        t = head;
         int i = 0;
-        while (temp != null) {
-            cardsArray[i] = temp.card;
-            temp = temp.next;
+        while (t != null) {
+            arr[i] = t.card;
+            t = t.next;
             i++;
         }
 
-        // Shuffle
         Random rnd = new Random();
         for (int k = count - 1; k > 0; k--) {
             int j = rnd.nextInt(k + 1);
-            Card tempCard = cardsArray[k];
-            cardsArray[k] = cardsArray[j];
-            cardsArray[j] = tempCard;
+            Card tmp = arr[k];
+            arr[k] = arr[j];
+            arr[j] = tmp;
         }
 
-        // Rebuild the list
         head = null;
-        for (Card card : cardsArray) {
-            insert(card);
+        for (int i1 = 0; i1 < arr.length; i1++) {
+            insert(arr[i1]);
         }
     }
 }

@@ -1,4 +1,4 @@
-class Tile {
+public class Tile {
 
     private final String name;
 
@@ -13,7 +13,7 @@ class Tile {
         if (name.toLowerCase().contains("chance")) {
             Card card = Card.drawChance();
             System.out.println("Chance: " + card.text);
-            card.applyEffect(p, ctrl);
+            card.applyEffect(p, ctrl);  // Apply the effect of the drawn Chance card
             return;
         }
 
@@ -29,8 +29,7 @@ class Tile {
         /* ---------- Property / Railroad / Utility ---------- */
         Property prop = ctrl.getMapManager().getProperty(p.position);
         if (prop != null) {
-            ctrl.getBuyingManager().handleSpace(
-              p, ctrl.getPlayers(), ctrl.getMapManager());
+            ctrl.getBuyingManager().handleSpace(p, ctrl.getPlayers(), ctrl.getMapManager());
             return;
         }
 
@@ -58,7 +57,8 @@ class Tile {
         else if (name.toLowerCase().contains("jail")) {
             if (name.equalsIgnoreCase("Go To Jail")) {
                 p.position = 10;          // square 10 = Jail
-                p.inJail   = true;
+                p.inJail = true;
+                p.jailTurns = 0;          // reset jail turns on entry
                 System.out.println(p.getName() + " goes directly to Jail!");
             } else {                      // “Just Visiting”
                 System.out.println(p.getName() + " is just visiting Jail.");
