@@ -1,295 +1,303 @@
 import java.util.Scanner;
 import java.util.Random;
+
 public class GameController {
 
-    /* board reference for SaveLoadManager */
-    private static MapManager boardRef;
+	/* board reference for SaveLoadManager */
+	private static MapManager boardRef;
 
-    /* managers */
-    private MapManager      mapManager;
-    private BuyingManager   buyingManager;
-    private AuctionManager  auctionManager;
-    private TradeManager    tradeManager;
-    private SaveLoadManager saveLoad;
+	/* managers */
+	private MapManager mapManager;
+	private BuyingManager buyingManager;
+	private AuctionManager auctionManager;
+	private TradeManager tradeManager;
+	private SaveLoadManager saveLoad;
 
-    /* slow printer */
-    private final PrintSlow printer = new PrintSlow();
+	/* slow printer */
+	private final PrintSlow printer = new PrintSlow();
 
-    /* participants */
-    private Participant[] players;
+	/* participants */
+	private Participant[] players;
 
-    /* console input */
-    private final Scanner input = new Scanner(System.in);
+	/* console input */
+	private final Scanner input = new Scanner(System.in);
 
-    /* ------------ free-parking tax pot ------------ */
-    private int freeParkingPot = 0;  // holds Income / Luxury tax until collected
+	/* ------------ free-parking tax pot ------------ */
+	private int freeParkingPot = 0; // holds Income / Luxury tax until collected
 
-    /* ------------ main entry ------------ */
-    public static void main(String[] args) {
-        new GameController().start();
-    }
+	/* ------------ main entry ------------ */
+	public static void main(String[] args) {
+		new GameController().start();
+	}
 
-    /* ------------ helpers for other classes ------------ */
-    public static MapManager getBoard()              { return boardRef; }
-    public MapManager       getMapManager()          { return mapManager; }
-    public BuyingManager    getBuyingManager()       { return buyingManager; }
-    public Participant[]    getPlayers()             { return players; }
+	/* ------------ helpers for other classes ------------ */
+	public static MapManager getBoard() {
+		return boardRef;
+	}
 
-    /* ===================================================
-     *  start()
-     * =================================================== */
-    public void start() {
+	public MapManager getMapManager() {
+		return mapManager;
+	}
 
-        mapManager     = new MapManager();
-        boardRef       = mapManager;
-        buyingManager  = new BuyingManager();
-        auctionManager = new AuctionManager();
-        tradeManager   = new TradeManager();
-        saveLoad       = new SaveLoadManager();
+	public BuyingManager getBuyingManager() {
+		return buyingManager;
+	}
 
-        String filePath = null;
+	public Participant[] getPlayers() {
+		return players;
+	}
 
-        /* ---------------- optional load ---------------- */
-        System.out.print("Load previous game? (y / n): ");
-        if (input.next().equalsIgnoreCase("y")) {
-            System.out.print("\nEnter save-file path: ");
-            filePath = input.next();
-            try {
-                players = saveLoad.load(filePath);
-            } catch (Exception ex) {
-                System.out.println("\nSave not found – starting new game.");
-            }
-        }
+	/*
+	 * =================================================== start()
+	 * ===================================================
+	 */
+	public void start() {
 
-        /* ---------------- new game ---------------- */
-        if (players == null) {
-            System.out.print("\nNumber of players (2-4): ");
-            int n = input.nextInt();
-            while (n < 2 || n > 4) {
-                System.out.print("Enter 2-4: ");
-                n = input.nextInt();
-            }
+		mapManager = new MapManager();
+		boardRef = mapManager;
+		buyingManager = new BuyingManager();
+		auctionManager = new AuctionManager();
+		tradeManager = new TradeManager();
+		saveLoad = new SaveLoadManager();
 
-            players = new Participant[n];
-            int i = 0;
-            while (i < n) {
-                printer.printSlow("\nName of Player " + (i + 1) + " (no spaces): ", 30);
-                players[i] = new Participant(input.next());
-                i = i + 1;
-            }
+		String filePath = null;
 
-            printer.printSlow("\nSave-file path: ", 30);
-            filePath = input.next();
-        }
+		/* ---------------- optional load ---------------- */
+		System.out.print("Load previous game? (y / n): ");
+		if (input.next().equalsIgnoreCase("y")) {
+			System.out.print("\nEnter save-file path: ");
+			filePath = input.next();
+			try {
+				players = saveLoad.load(filePath);
+			} catch (Exception ex) {
+				System.out.println("\nSave not found – starting new game.");
+			}
+		}
 
-        saveLoad.setFile(filePath);
+		/* ---------------- new game ---------------- */
+		if (players == null) {
+			System.out.print("\nNumber of players (2-4): ");
+			int n = input.nextInt();
+			while (n < 2 || n > 4) {
+				System.out.print("Enter 2-4: ");
+				n = input.nextInt();
+			}
 
-        gameLoop();
-    }
+			players = new Participant[n];
+			int i = 0;
+			while (i < n) {
+				printer.printSlow("\nName of Player " + (i + 1) + " (no spaces): ", 30);
+				players[i] = new Participant(input.next());
+				i = i + 1;
+			}
 
-    /* ===================================================
-     *  main game loop
-     * =================================================== */
-    private void gameLoop() {
+			printer.printSlow("\nSave-file path: ", 30);
+			filePath = input.next();
+		}
 
-        boolean gameOver = false;
+		saveLoad.setFile(filePath);
 
-        while (!gameOver) {
+		gameLoop();
+	}
 
-            int idxTurn = 0;
-            while (idxTurn < players.length) {
+	/*
+	 * =================================================== main game loop
+	 * ===================================================
+	 */
+	private void gameLoop() {
 
-                Participant current = players[idxTurn];
+		boolean gameOver = false;
 
-                if (!current.bankrupt) {
+		while (!gameOver) {
 
-                    /* -------- build before roll -------- */
-                    printer.printSlow("\n" + current.getName()
-                        + " – build before rolling (y / n)? ", 30);
-                    String ans = input.next();
-                    if (ans.equalsIgnoreCase("y")) {
-                        listBuildOptions(current);
-                        System.out.println();
-                        printer.printSlow("Board location (-1 cancel): ", 30);
-                        int locChoice = input.nextInt();
-                        if (locChoice >= 0) {
-                            attemptBuild(current, locChoice);
-                        }
-                    }
+			int idxTurn = 0;
+			while (idxTurn < players.length) {
 
-                    /* -------- board render -------- */
-                    mapManager.render(players);
+				Participant current = players[idxTurn];
 
-                    /* -------- roll the dice -------- */
-                    printer.printSlow(current.getName() + " – Rolling Dice", 75);
-                    printer.printSlowln("...", 750);
+				if (!current.bankrupt) {
 
-                    int d1  = 0;
-                    int d2  = 0;
-                    int sum = 0;
+					/* -------- build before roll -------- */
+					printer.printSlow("\n" + current.getName() + " – build before rolling (y / n)? ", 30);
+					String ans = input.next();
+					if (ans.equalsIgnoreCase("y")) {
+						listBuildOptions(current);
+						System.out.println();
+						printer.printSlow("Board location (-1 cancel): ", 30);
+						int locChoice = input.nextInt();
+						if (locChoice >= 0) {
+							attemptBuild(current, locChoice);
+						}
+					}
 
-                    while (d1 == d2) {        // loop while doubles
+					/* -------- board render -------- */
+					mapManager.render(players);
 
-                        d1  = roll();
-                        d2  = roll();
-                        sum = d1 + d2;
+					/* -------- roll the dice -------- */
+					printer.printSlow(current.getName() + " – Rolling Dice", 75);
+					printer.printSlowln("...", 750);
 
-                        if (d1 == d2) {
-                            printer.printSlowln(current.getName()
-                                + " rolled a Double: " + sum, 50);
-                        } else {
-                            printer.printSlowln(current.getName()
-                                + " rolled: " + sum, 50);
-                        }
+					int d1 = 0;
+					int d2 = 0;
+					int sum = 0;
 
-                        current.move(sum);
+					while (d1 == d2) { // loop while doubles
 
-                        Tile landed = mapManager.getTile(current.position);
-                        landed.landOn(current, this);
+						d1 = roll();
+						d2 = roll();
+						sum = d1 + d2;
 
-                        if (current.money < 0 || current.getNetWorth() <= 0) {
-                            current.bankrupt = true;
-                            printer.printSlowln(current.getName() + " is bankrupt!");
-                        }
+						if (d1 == d2) {
+							printer.printSlowln(current.getName() + " rolled a Double: " + sum, 50);
+						} else {
+							printer.printSlowln(current.getName() + " rolled: " + sum, 50);
+						}
 
-                        showStats();   // quick status after each move
-                    }
-                }
-                idxTurn = idxTurn + 1;
-            }
+						current.move(sum);
 
-            /* -------- trade phase -------- */
-            tradeManager.trade(players);
+						Tile landed = mapManager.getTile(current.position);
+						landed.landOn(current, this);
 
-            /* -------- auto-save -------- */
-            try {
-                saveLoad.save(players);
-                printer.printSlowln("Game auto-saved.", 50);
-            } catch (Exception ex) {
-                printer.printSlowln("Auto-save failed – new path? ", 50);
-                saveLoad.setFile(input.next());
-            }
+						if (current.money < 0 || current.getNetWorth() <= 0) {
+							current.bankrupt = true;
+							printer.printSlowln(current.getName() + " is bankrupt!");
+						}
 
-            /* -------- win check -------- */
-            int alive = 0;
-            Participant lastAlive = null;
-            int scan = 0;
-            while (scan < players.length) {
-                if (!players[scan].bankrupt) {
-                    alive = alive + 1;
-                    lastAlive = players[scan];
-                }
-                scan = scan + 1;
-            }
-            if (alive <= 1) {
-                gameOver = true;
-                if (lastAlive != null) {
-                    printer.printSlowln(lastAlive.getName() + " Wins the Game!", 150);
-                }
-            }
-        }
-    }
+						showStats(); // quick status after each move
+					}
+				}
+				idxTurn = idxTurn + 1;
+			}
 
-    /* ===================================================
-     *  free-parking helpers
-     * =================================================== */
-    public void addToPot(int amount) {
-        if (amount > 0) {
-            freeParkingPot = freeParkingPot + amount;
-        }
-    }
+			/* -------- trade phase -------- */
+			tradeManager.trade(players);
 
-    public int collectPot() {
-        int cash = freeParkingPot;
-        freeParkingPot = 0;
-        return cash;
-    }
+			/* -------- auto-save -------- */
+			try {
+				saveLoad.save(players);
+				printer.printSlowln("Game auto-saved.", 50);
+			} catch (Exception ex) {
+				printer.printSlowln("Auto-save failed – new path? ", 50);
+				saveLoad.setFile(input.next());
+			}
 
-    /* ===================================================
-     *  build-related helpers
-     * =================================================== */
-    private void listBuildOptions(Participant p) {
+			/* -------- win check -------- */
+			int alive = 0;
+			Participant lastAlive = null;
+			int scan = 0;
+			while (scan < players.length) {
+				if (!players[scan].bankrupt) {
+					alive = alive + 1;
+					lastAlive = players[scan];
+				}
+				scan = scan + 1;
+			}
+			if (alive <= 1) {
+				gameOver = true;
+				if (lastAlive != null) {
+					printer.printSlowln(lastAlive.getName() + " Wins the Game!", 150);
+				}
+			}
+		}
+	}
 
-        printer.printSlowln("\nBuild-eligible properties:", 25);
+	/*
+	 * =================================================== free-parking helpers
+	 * ===================================================
+	 */
+	public void addToPot(int amount) {
+		if (amount > 0) {
+			freeParkingPot = freeParkingPot + amount;
+		}
+	}
 
-        int loc = 0;
-        while (loc < 40) {
-            Property prop = p.core.getOwnedProperties().searchByLocation(loc);
+	public int collectPot() {
+		int cash = freeParkingPot;
+		freeParkingPot = 0;
+		return cash;
+	}
 
-            if (prop != null
-                && prop.getType().equals("property")
-                && !prop.isMortgaged()
-                && new BuyingManager().ownsColourSet(p, prop)) {
+	/*
+	 * =================================================== build-related helpers
+	 * ===================================================
+	 */
+	private void listBuildOptions(Participant p) {
 
-                printer.printSlowln(
-                    loc + " : " + prop.getName()
-                        + "  cost $" + prop.getHouseCost()
-                        + "  houses " + prop.getHouseCost(), 30);
-            }
-            loc = loc + 1;
-        }
-    }
+		printer.printSlowln("\nBuild-eligible properties:", 25);
 
-    private void attemptBuild(Participant p, int loc) {
+		int loc = 0;
+		while (loc < 40) {
+			Property prop = p.core.getOwnedProperties().searchByLocation(loc);
 
-        Property prop = p.core.getOwnedProperties().searchByLocation(loc);
+			if (prop != null && prop.getType().equals("property") && !prop.isMortgaged()
+					&& new BuyingManager().ownsColourSet(p, prop)) {
 
-        if (prop == null) {
-            printer.printSlowln("You don’t own a property at " + loc, 50);
-            return;
-        }
-        if (prop.isMortgaged()) {
-            printer.printSlowln("Property is mortgaged.", 50);
-            return;
-        }
-        if (!new BuyingManager().ownsColourSet(p, prop)) {
-            printer.printSlowln("You do not own the full set.", 50);
-            return;
-        }
-        int cost = prop.getHouseCost();
-        if (p.money < cost) {
-            printer.printSlowln("Not enough cash.", 50);
-            return;
-        }
-        boolean built = prop.buildHouse();
-        if (built) {
-            p.money = p.money - cost;
-            printer.printSlowln("Built on "
-                + prop.getName() + ". New rent $" + prop.getRent(), 50);
-        } else {
-            printer.printSlowln("Cannot build further on that property.");
-        }
-    }
+				printer.printSlowln(loc + " : " + prop.getName() + "  cost $" + prop.getHouseCost() + "  houses "
+						+ prop.getHouseCost(), 30);
+			}
+			loc = loc + 1;
+		}
+	}
 
-    /* ===================================================
-     *  simple status screen
-     * =================================================== */
-    private void showStats() {
+	private void attemptBuild(Participant p, int loc) {
 
-        printer.printSlowln("\n-- Status --", 25);
+		Property prop = p.core.getOwnedProperties().searchByLocation(loc);
 
-        int idx = 0;
-        while (idx < players.length) {
-            Participant p = players[idx];
+		if (prop == null) {
+			printer.printSlowln("You don’t own a property at " + loc, 50);
+			return;
+		}
+		if (prop.isMortgaged()) {
+			printer.printSlowln("Property is mortgaged.", 50);
+			return;
+		}
+		if (!new BuyingManager().ownsColourSet(p, prop)) {
+			printer.printSlowln("You do not own the full set.", 50);
+			return;
+		}
+		int cost = prop.getHouseCost();
+		if (p.money < cost) {
+			printer.printSlowln("Not enough cash.", 50);
+			return;
+		}
+		boolean built = prop.buildHouse();
+		if (built) {
+			p.money = p.money - cost;
+			printer.printSlowln("Built on " + prop.getName() + ". New rent $" + prop.getRent(), 50);
+		} else {
+			printer.printSlowln("Cannot build further on that property.");
+		}
+	}
 
-            printer.printSlow(p.getName()
-                + " cash $" + p.money
-                + " net $"  + p.getNetWorth(), 25);
+	/*
+	 * =================================================== simple status screen
+	 * ===================================================
+	 */
+	private void showStats() {
 
-            if (p.bankrupt) {
-                printer.printSlowln(" [BANKRUPT]", 25);
-            } else {
-                System.out.println();
-            }
-            idx = idx + 1;
-        }
-        System.out.println();
-    }
+		printer.printSlowln("\n-- Status --", 25);
 
-    /* ===================================================
-     *  dice
-     * =================================================== */
-    public static int roll() {
-        return (int)(Math.random() * 6) + 1;    //return (int)(Math.random() * 6) + 1;
-    }
+		int idx = 0;
+		while (idx < players.length) {
+			Participant p = players[idx];
+
+			printer.printSlow(p.getName() + " cash $" + p.money + " net $" + p.getNetWorth(), 25);
+
+			if (p.bankrupt) {
+				printer.printSlowln(" [BANKRUPT]", 25);
+			} else {
+				System.out.println();
+			}
+			idx = idx + 1;
+		}
+		System.out.println();
+	}
+
+	/*
+	 * =================================================== dice
+	 * ===================================================
+	 */
+	public static int roll() {
+		return (int) (Math.random() * 6) + 1; // return (int)(Math.random() * 6) + 1;
+	}
 }

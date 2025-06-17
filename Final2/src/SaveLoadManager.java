@@ -1,6 +1,5 @@
 // File: SaveLoadManager.java
 
-
 import java.io.*;
 
 public class SaveLoadManager {
@@ -19,7 +18,7 @@ public class SaveLoadManager {
 		for (int i = 0; i < players.length; i++) {
 			Participant p = players[i];
 			writer.print(p.getName() + "," + p.money + "," + p.position + "," + p.inJail + "," + p.bankrupt + ","
-				+ p.hasGetOutOfJailCard + "|");
+					+ p.hasGetOutOfJailCard + "|");
 
 			String locations = "";
 			for (int loc = 0; loc < 40; loc++) {
